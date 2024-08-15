@@ -1,6 +1,5 @@
 import  graph_text_encoder
 import random
-import json
 import networkx as nx
 def self_deepwalk(node_list,edge_list,num_of_walks,max_length,is_random,start_nodes='None',):
     graph=nx.Graph()
@@ -37,7 +36,6 @@ def Task_of_CycleCheck(graphs_dict,
       ):
     """The graph task to check if there is at least one cycle or not."""
 
-    'You just need to give me the final answer.'
     examples_dict = {}
     for ind, graph in graphs_dict.items():
       task_description = '\nQ: Is there at least one cycle in this graph? You just need to give me the final answer.\nA: '
@@ -48,11 +46,8 @@ def Task_of_CycleCheck(graphs_dict,
          new_question+='The indegree of node %s is %s. '%(str(k),sequences_in[k])
          new_question+='The outdegree of node %s is %s. '%(str(k),sequences_out[k])
       
-
-      
       new_question+=task_description
 
-      
       initial_question =graph_text_encoder.encode_graph(graph['node_list'],graph['edge_list'], encoding_method,is_directed=False)
       initial_question+=task_description
 
@@ -73,10 +68,9 @@ def  Task_of_EulerGraph(graphs_dict,
       ):
     """The graph task to check if this graph is an euler graph on undirected graph."""
 
-    # You just need to give me the final answer.
     examples_dict = {}
     for ind, graph in graphs_dict.items():
-      task_description = '\nQ: Is this graph an euler graph?\nA: '
+      task_description = '\nQ: Is this graph an euler graph? You just need to give me the final answer.\nA: '
       new_question = graph_text_encoder.encode_graph(graph['node_list'],graph['edge_list'], encoding_method,is_directed=False)
       new_question+='Now you need to check if this graph is an euler graph or not. There is some useful information of node degrees in this graph may help you reason by using relative algorithm. '
       
@@ -100,15 +94,13 @@ def  Task_of_EulerGraph(graphs_dict,
       }
     return examples_dict
 
-def Task_of_Reachability(graphs_dict,
+def Task_of_Path_existence(graphs_dict,
       encoding_method,
       ):
     """The graph task to check if there is a path from a source to target on undirected graph."""
-
-    'You just need to give me the final answer.'
     examples_dict = {}
     for ind, graph in graphs_dict.items():
-      task_description = '\nQ: Is there a path between node %s and node %s?\nA: '% (
+      task_description = '\nQ: Is there a path between node %s and node %s? You just need to give me the final answer.\nA: '% (
           str(graph['task_node'][0]),
           str(graph['task_node'][1]),
       )
@@ -148,10 +140,8 @@ def Task_of_Reachability(graphs_dict,
       }
     return examples_dict
 
-def Task_of_Reachability_directed(graphs_dict,encoding_method):
+def Task_of_Path_existence_directed(graphs_dict,encoding_method):
     """The graph task to check if there is a path from a source to target on directed graph."""
-
-    #'You just need to give me the final answer.'
     examples_dict = {}
     for ind, graph in graphs_dict.items():
       task_description = '\nQ: Is there a path from node %s and node %s? You just need to give me the final answer.\nA: '% (
@@ -192,14 +182,11 @@ def Task_of_Reachability_directed(graphs_dict,encoding_method):
 def Task_of_EulerGraph_directed(graphs_dict,encoding_method):
     """The graph task to check if this graph is an euler graph on directed graph."""
 
-    # You just need to give me the final answer.
     examples_dict = {}
     for ind, graph in graphs_dict.items():
       task_description = '\nQ: Is this graph an euler graph? You just need to give me the final answer.\nA: '
       new_question = graph_text_encoder.encode_graph(graph['node_list'],graph['edge_list'], encoding_method,is_directed=True)
       new_question+='Now you need to check if this graph is an euler graph or not. There is some useful information of node degrees in this graph may help you reason by using relative algorithm. '
-      #new_question+='There are some knowledge may help you to reaosn: A graph is euler graph if and only if the graph is connected and the number of odd degree nodes in graph G is 0. To answer the question of euler graph, you can try to calculate the degree of each node in this graph firstly and then reason step by step.' 
-      #'There are some information about the degree of nodes may help you understand this graph. '
       sequences_in,sequences_out=graph['indegree_list'],graph['outdegree_list']
       for k in range(len(sequences_in)):
          new_question+='The indegree of node %s is %s. '%(str(k),sequences_in[k])
@@ -225,20 +212,17 @@ def Task_of_EulerGraph_directed(graphs_dict,encoding_method):
 def Task_of_CycleCheck_directed(graphs_dict,encoding_method):
     """The graph task to check if there is at least one cycle or not."""
 
-    #'You just need to give me the final answer.'
     examples_dict = {}
     for ind, graph in graphs_dict.items():
       task_description = '\nQ: Is there at least one cycle in this graph? You just need to give me the final answer.\nA: '
       new_question = graph_text_encoder.encode_graph(graph['node_list'],graph['edge_list'], encoding_method,is_directed=True)
-          
-
+        
       new_question+="Now you need to check if there is at least one cycle in graph or not. There is some useful information of node degrees in this graph may help you reason by using relative algorithm. "
       sequences_in,sequences_out=graph['indegree_list'],graph['outdegree_list']
       for k in range(len(sequences_in)):
          new_question+='The indegree of node %s is %s. '%(str(k),sequences_in[k])
          new_question+='The outdegree of node %s is %s. '%(str(k),sequences_out[k])
       new_question+=task_description
-
       
       initial_question =graph_text_encoder.encode_graph(graph['node_list'],graph['edge_list'], encoding_method,is_directed=True)
       initial_question+=task_description
@@ -258,18 +242,10 @@ def Task_of_CycleCheck_directed(graphs_dict,encoding_method):
 
 TASK_CLASS = {
     'cycle_check':  Task_of_CycleCheck,
-    'reachability': Task_of_Reachability,
+    'Path_existence': Task_of_Path_existence,
     'euler_graph': Task_of_EulerGraph,
-    'reachability_directed':Task_of_Reachability_directed,
+    'Path_existence_directed':Task_of_Path_existence_directed,
     'cycle_check_directed':Task_of_CycleCheck_directed,
     'euler_graph_directed':Task_of_EulerGraph_directed
     
     }
-if __name__=='__main__':
-  task_type='cycle_check'
-  scale='medium'
-  with open('./new_code/'+task_type+'/'+scale+'/'+task_type+'_datas.json', 'r') as f:
-      graphs_dict= json.load(f)
-  examples_dict=Task_of_CycleCheck(graphs_dict,encoding_method='incident')
-  with open('./new_code/'+task_type+'/'+scale+'/'+task_type+'_examples.json', 'w',encoding='utf-8') as f2:
-      b = json.dump(examples_dict,f2,)

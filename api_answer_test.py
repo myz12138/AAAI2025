@@ -1,6 +1,6 @@
 import json
-task='reachability'#"cycle_check","euler_graph"
-data_type='large'#'small","medium"
+task='path_existence'#"cycle_check","euler_graph"
+data_type='hard'#'easy","medium"
 model_name="claude-3-sonnet-20240229"
 data_file='undirected_data'
 

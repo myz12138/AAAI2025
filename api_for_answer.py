@@ -33,11 +33,11 @@ def create_completion(model, messages):
     )
 
 if __name__=="__main__":
-    task_list=['euler_graph']
-    type_list=['large','medium','small']
+    task_list=['path_existence','euler_graph','cycle_check']
+    type_list=['hard','medium','easy']
     for task in task_list:
         for data_type in type_list:
-            model_name="claude-3-sonnet-20240229"
+            model_name=""
             data_file='undirected_data'
             answer_dic={}
 
@@ -53,12 +53,10 @@ if __name__=="__main__":
             )
         
             print('start %s for %s for %s on %s graph'%(model_name,data_file,task,data_type))
-            i=0
+           
             for key,value in json_file.items():
                 
-                if random.random()<0.89 :
-                    continue
-                i+=1
+                
                 model=model_name,
                 messages_initial=[
                     {
@@ -85,8 +83,6 @@ if __name__=="__main__":
                 answer_dic[key]["api_answer_new"]=completion_new.choices[0].message.content   
                 print(key,":",answer_dic[key])
                 answer_dic[key]['initial_judge'],answer_dic[key]['new_judge']='',''
-                if i>100:
-                    break
                 write_file.update({key:answer_dic[key]})
                 with open('./'+data_file+'/'+task+'/'+data_type+'/answer_of_'+task+'_'+model_name+'.json', 'w',encoding='utf-8') as f:
                     b = json.dump(write_file,f,indent=1)

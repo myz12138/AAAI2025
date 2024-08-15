@@ -4,14 +4,14 @@ import random
 import json
 import os
 
-NUM_OF_GRAPHS=100
-SCALE_OF_GRAPH = ["small",
+NUM_OF_GRAPHS=1000
+SCALE_OF_GRAPH = ["easy",
     "medium",
-    "large",]
+    "hard",]
     
 task_list=[
     'cycle_check',
-    'reachability',
+    'path_existence',
     'euler_path',
     ]
 
@@ -23,7 +23,7 @@ def count_distribution(task,graphs_dict):
             k+=1
     return k/len(graphs_dict)
 
-task='euler_graph'#'reachability'#'euler_graph'
+task='euler_graph'#'path_existence'#'euler_graph'
 data_file='undirected_data'
 for data_type in SCALE_OF_GRAPH:
     graphs_dict=graph_create.GRAPH_CLASS[task](number_of_graphs=NUM_OF_GRAPHS,graph_scale=data_type,is_directed=False)

@@ -11,9 +11,9 @@ import os
 import euler_undirected
 import euler_directed
 _NUMBER_OF_NODES_RANGE = {
-    "small":  (5, 15),
+    "easy":  (5, 15),
     "medium":  (16, 25),
-    "large":  (26,35),
+    "hard":  (26,35),
 }
 
  #func of add_edge based probability
@@ -31,31 +31,20 @@ def Graphs_for_CycleCheck(number_of_graphs,graph_scale,is_directed):
     #graph generator
     cycle_p={
         #undirected
-        # "small":  0.83,
-        # "medium": 0.93,
-        # "large":  0.96,
-
-        #directed
-        "small":  0.6,
-        "medium": 0.01,
-        "large":  0.01,
+        "easy":  0.83,
+        "medium": 0.93,
+        "hard":  0.96
     }
     cycle_p2={
         #undirected
-        # "small":  0.83,
-        # "medium": 0.93,
-        # "large":  0.96,
+        "easy":  0.83,
+        "medium": 0.93,
+        "hard":  0.96,
 
-        #directed
-        "small":  0.98,
-        "medium": 1,
-        "large":  1,
     }
     for i in range(number_of_graphs):
-        if not is_directed:
-            G = nx.Graph() 
-        else:
-            G = nx.DiGraph()
+
+        G = nx.Graph() 
         num_nodes =random.randint( _NUMBER_OF_NODES_RANGE[graph_scale][0],_NUMBER_OF_NODES_RANGE[graph_scale][1])
         G.add_nodes_from([node for node in range(num_nodes)]) 
         for node1 in range(num_nodes):
@@ -79,7 +68,6 @@ def Graphs_for_CycleCheck(number_of_graphs,graph_scale,is_directed):
         else:
             graphs[i]['degree_list']=[G.degree(i) for i in list(G.nodes())]
         
-        #task_specialized node generator
         try:
             path=[u for u,v in nx.find_cycle(G)]
             graphs[i]['answer']='Yes'
@@ -89,25 +77,17 @@ def Graphs_for_CycleCheck(number_of_graphs,graph_scale,is_directed):
     return graphs
     
 
-def Graphs_for_Reachability(number_of_graphs,graph_scale,is_directed):
+def Graphs_for_Path_existence(number_of_graphs,graph_scale,is_directed):
     graphs={}
     #graph generator
     Reachability_p={
         #undirected
-        # "small":  0.82,
-        # "medium": 0.91,
-        # "large":  0.94
-
-        #directed
-        "small":  0.82,
+        "easy":  0.81,
         "medium": 0.91,
-        "large":  0.94
+        "hard":  0.93
     }
     for i in range(number_of_graphs):
-        if not is_directed:
-            G = nx.Graph() 
-        else:
-            G = nx.DiGraph()
+        G = nx.Graph() 
         num_nodes =random.randint( _NUMBER_OF_NODES_RANGE[graph_scale][0],_NUMBER_OF_NODES_RANGE[graph_scale][1])
         G.add_nodes_from([node for node in range(num_nodes)]) 
         for node1 in range(num_nodes):
@@ -124,18 +104,15 @@ def Graphs_for_Reachability(number_of_graphs,graph_scale,is_directed):
             'edge_list':list(G.edges()),
             'direct_bool':is_directed,
             'scale':graph_scale,
-            'task':'reachability'
+            'task':'Path_existence'
         }
     #task_specialized node generator
         source, target = random.sample(list(G.nodes()), k=2)
         graphs[i]['task_node']=[source, target]
         if nx.has_path(G, source, target):
-            
             graphs[i]['answer'] = 'Yes'
         else:
-            
             graphs[i]['answer']  = 'No'
-        
     return graphs
  
 
@@ -145,12 +122,10 @@ def Graphs_for_EulerGrpah(number_of_graphs,graph_scale,is_directed):
     #graph generator
     for i in range(number_of_graphs):
         num_nodes =random.randint( _NUMBER_OF_NODES_RANGE[graph_scale][0],_NUMBER_OF_NODES_RANGE[graph_scale][1])
-        
         if random.random()<0.5:
-            G = euler_directed.create_directed_eulerian_graph(num_nodes)
+            G = euler_undirected.create_eulerian_graph(num_nodes)
         else:
-            G=euler_directed.create_non_eulerian_graph(num_nodes)
-        
+            G=euler_undirected.create_non_eulerian_graph(num_nodes)
         graphs[i]={
             'node_list':list(G.nodes()),
             'edge_list':list(G.edges()),
@@ -158,24 +133,56 @@ def Graphs_for_EulerGrpah(number_of_graphs,graph_scale,is_directed):
             'scale':graph_scale,
             'task':'euler_graph'
         }
-        if is_directed:
-            graphs[i]['indegree_list']=[G.in_degree(i) for i in list(G.nodes())]
-            graphs[i]['outdegree_list']=[G.out_degree(i) for i in list(G.nodes())]
-        else:
-            graphs[i]['degree_list']=[G.degree(i) for i in list(G.nodes())]
-    #task_specialized node generator
+        graphs[i]['degree_list']=[G.degree(i) for i in list(G.nodes())]
        
         try:
             path = [u for u, v in nx.eulerian_circuit(G,keys=False)]
             graphs[i]['answer'] ='Yes' 
         except nx.NetworkXError:
             graphs[i]['answer'] = 'No'
-            #'There is no euler path from node %s.' % str(source_node)
+    
         
     return graphs
 
+def DirectedGraphs_for_Path_existence(number_of_graphs,graph_scale,is_directed):
+    graphs={}
+    #graph generator
+    Reachability_p={
+        "easy":  0.81,
+        "medium": 0.91,
+        "hard":  0.93
+    }
+    for i in range(number_of_graphs):
+        G = nx.DiGraph()
+        num_nodes =random.randint( _NUMBER_OF_NODES_RANGE[graph_scale][0],_NUMBER_OF_NODES_RANGE[graph_scale][1])
+        G.add_nodes_from([node for node in range(num_nodes)]) 
+        not_existence_edges=[]
+        for node1 in range(num_nodes):
+            for node2 in range(node1):
+                probability = random.random()
+                if probability > Reachability_p[graph_scale]:
+                    G.add_edge(node1, node2) 
+                else:
+                    not_existence_edges.append((node1,node2))  
+        graphs[i]={
+            'node_list':list(G.nodes()),
+            'edge_list':list(G.edges()),
+            'direct_bool':is_directed,
+            'scale':graph_scale,
+            'task':'Path_existence'
+        }
 
-def DirectedGraph_for_cycle_check(number_of_graphs,graph_scale,is_directed):
+        source, target = random.sample(list(G.nodes()), k=2)
+        graphs[i]['task_node']=[source, target]
+        if nx.has_path(G, source, target): 
+            graphs[i]['answer'] = 'Yes'
+        else:
+            graphs[i]['answer']  = 'No'
+        
+    return graphs
+    
+
+def DirectedGraphs_for_cycle_check(number_of_graphs,graph_scale,is_directed):
     graphs={}
     #graph generator
     cycle_p={
@@ -186,10 +193,7 @@ def DirectedGraph_for_cycle_check(number_of_graphs,graph_scale,is_directed):
     }
     
     for i in range(number_of_graphs):
-        if not is_directed:
-            G = nx.Graph() 
-        else:
-            G = nx.DiGraph()
+        G = nx.DiGraph()
         num_nodes =random.randint( _NUMBER_OF_NODES_RANGE[graph_scale][0],_NUMBER_OF_NODES_RANGE[graph_scale][1])
         G.add_nodes_from([node for node in range(num_nodes)]) 
         for node1 in range(num_nodes):
@@ -197,7 +201,6 @@ def DirectedGraph_for_cycle_check(number_of_graphs,graph_scale,is_directed):
                 probability = random.random()
                 if probability >cycle_p[graph_scale] and node1!=node2:
                     G.add_edge(node1, node2) 
-                
         graphs[i]={
             'node_list':list(G.nodes()),
             'edge_list':list(G.edges()),
@@ -206,13 +209,9 @@ def DirectedGraph_for_cycle_check(number_of_graphs,graph_scale,is_directed):
             'task':'cycle_check'
         }
         
-        if is_directed:
-            graphs[i]['indegree_list']=[G.in_degree(i) for i in list(G.nodes())]
-            graphs[i]['outdegree_list']=[G.out_degree(i) for i in list(G.nodes())]
-        else:
-            graphs[i]['degree_list']=[G.degree(i) for i in list(G.nodes())]
-        
-        #task_specialized node generator
+      
+        graphs[i]['indegree_list']=[G.in_degree(i) for i in list(G.nodes())]
+        graphs[i]['outdegree_list']=[G.out_degree(i) for i in list(G.nodes())]
         try:
             path=[u for u,v in nx.find_cycle(G)]
             graphs[i]['answer']='Yes'
@@ -222,7 +221,7 @@ def DirectedGraph_for_cycle_check(number_of_graphs,graph_scale,is_directed):
     return graphs
 
 
-def DirectedGraph_for_euler_graph(number_of_graphs,graph_scale,is_directed):
+def DirectedGraphs_for_euler_graph(number_of_graphs,graph_scale,is_directed):
     graphs={}
     
     #graph generator
@@ -233,7 +232,7 @@ def DirectedGraph_for_euler_graph(number_of_graphs,graph_scale,is_directed):
             G = euler_directed.generate_euler_graph(num_nodes)
         else:
             G=euler_directed.generate_non_euler_graph(num_nodes)
-        
+           
         graphs[i]={
             'node_list':list(G.nodes()),
             'edge_list':list(G.edges()),
@@ -241,34 +240,26 @@ def DirectedGraph_for_euler_graph(number_of_graphs,graph_scale,is_directed):
             'scale':graph_scale,
             'task':'euler_graph'
         }
-        if is_directed:
-            graphs[i]['indegree_list']=[G.in_degree(i) for i in list(G.nodes())]
-            graphs[i]['outdegree_list']=[G.out_degree(i) for i in list(G.nodes())]
-        else:
-            graphs[i]['degree_list']=[G.degree(i) for i in list(G.nodes())]
-    #task_specialized node generator
        
+        graphs[i]['indegree_list']=[G.in_degree(i) for i in list(G.nodes())]
+        graphs[i]['outdegree_list']=[G.out_degree(i) for i in list(G.nodes())]
         try:
             path = [u for u, v in nx.eulerian_circuit(G,keys=False)]
-            
             graphs[i]['answer'] ='Yes' 
         except nx.NetworkXError:
             graphs[i]['answer'] = 'No'
-            
+
+        
     return graphs
-
-
-
-
 
 
 GRAPH_CLASS = {
     'cycle_check':  Graphs_for_CycleCheck,
-    'reachability': Graphs_for_Reachability,
+    'reachability': Graphs_for_Path_existence,
     'euler_graph':Graphs_for_EulerGrpah,
-    'reachability_directed':Graphs_for_Reachability,
-    'cycle_check_directed':DirectedGraph_for_cycle_check,
-    'euler_graph_directed':DirectedGraph_for_euler_graph
+    'reachability_directed':DirectedGraphs_for_Path_existence,
+    'cycle_check_directed':DirectedGraphs_for_cycle_check,
+    'euler_graph_directed':DirectedGraphs_for_euler_graph
     
     }
 
@@ -281,21 +272,3 @@ def default_dump(obj):
     else:
         return obj
 
-if __name__=='__main__':
-    graphs=Graphs_for_CycleCheck(number_of_graphs=1000,graph_scale='medium',is_directed=False)
-
-    k=0
-    for key,value in graphs.items():
-        print(value['answer'])
-        if value['answer']=='Yes':
-            k+=1
-    print(k/len(graphs))
-
-    task_type='cycle_check'
-    scale='medium'
-    dirs = './new_code/'+task_type+'/'+scale
-    if not os.path.exists(dirs):
-        os.makedirs(dirs)
-
-    with open('./new_code/'+task_type+'/'+scale+'/'+task_type+'_datas.json', 'w',encoding='utf-8') as f:
-        b = json.dump(graphs,f,default=default_dump,)
